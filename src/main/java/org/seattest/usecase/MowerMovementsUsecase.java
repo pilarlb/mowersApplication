@@ -20,11 +20,11 @@ public class MowerMovementsUsecase {
 
             if(equalChar(movementsList[i], LEFT) || equalChar(movementsList[i], RIGHT)){
 
-                int result = moveHeading(mower, movementsList[i]);
+                moveHeading(mower, movementsList[i]);
 
             }else if(equalChar(movementsList[i], MOVE)){
 
-                int result = moveForward(mower);
+                moveForward(mower);
 
             }else{
 

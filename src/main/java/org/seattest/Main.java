@@ -25,19 +25,9 @@ public class Main {
         mowerOne = getAnswersFromScanner(plateau);
         mowerTwo = getAnswersFromScanner(plateau);
 
-        Thread mowerOneMoves = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(usecase.moves(mowerOne));
-            }
-        });
+        Thread mowerOneMoves = new Thread(() -> System.out.println(usecase.moves(mowerOne)));
 
-        Thread mowerTwoMoves = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(usecase.moves(mowerTwo));
-            }
-        });
+        Thread mowerTwoMoves = new Thread(() -> System.out.println(usecase.moves(mowerTwo)));
 
         mowerOneMoves.start();
 
