@@ -6,6 +6,8 @@ import org.seattest.usecase.MowerMovementsUsecase;
 
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class Main {
 
@@ -17,6 +19,7 @@ public class Main {
         Plateau plateau;
         MowerMovementsUsecase usecase = new MowerMovementsUsecase();
         Mower mowerOne, mowerTwo;
+        String finalPositionMowerOne;
 
         System.out.println("Enter upper-right coordinates of the plateau");
 
@@ -25,18 +28,24 @@ public class Main {
         mowerOne = getAnswersFromScanner(plateau);
         mowerTwo = getAnswersFromScanner(plateau);
 
-        Thread mowerOneMoves = new Thread(() -> System.out.println(usecase.moves(mowerOne)));
-
-        Thread mowerTwoMoves = new Thread(() -> System.out.println(usecase.moves(mowerTwo)));
-
-        mowerOneMoves.start();
+        CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(
+                () -> usecase.moves(mowerOne))
+                .thenCompose(positionMowerOne -> {
+                    System.out.println(positionMowerOne);
+                    plateau.setOccupiedPosition(positionMowerOne);
+                    mowerTwo.setPlateau(plateau);
+                    return CompletableFuture.supplyAsync(
+                            () -> usecase.moves(mowerTwo));});
 
         try {
-            mowerOneMoves.join();
+            System.out.println(completableFuture.get());
+            //mowerOneMoves.join();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        mowerTwoMoves.start();
+
     }
 
     /**

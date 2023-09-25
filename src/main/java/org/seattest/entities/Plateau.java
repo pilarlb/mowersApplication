@@ -4,6 +4,7 @@ public class Plateau {
 
     private int coordinateX;
     private int coordinateY;
+    private String occupiedPosition;
 
     public Plateau() {
     }
@@ -22,5 +23,13 @@ public class Plateau {
 
     public void setCoordinateY(int coordinateY) {
         this.coordinateY = coordinateY;
+    }
+
+    public String getOccupiedPosition() {
+        return occupiedPosition;
+    }
+
+    public void setOccupiedPosition(String occupiedPosition) {
+        this.occupiedPosition = occupiedPosition;
     }
 }

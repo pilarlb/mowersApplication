@@ -5,6 +5,7 @@ import org.seattest.entities.Plateau;
 
 import java.util.HashMap;
 
+import static java.util.Objects.isNull;
 import static org.seattest.util.GlobalConstants.*;
 
 public class MowerMovementsUsecase {
@@ -43,9 +44,25 @@ public class MowerMovementsUsecase {
      * Validates the next position of the mower is not out of the plateau border
      */
     private boolean validateIsNotOutOfBorder(Plateau plateau, int coordinateX, int coordinateY){
-        return (plateau.getCoordinateX() != coordinateX || plateau.getCoordinateY() != coordinateY)
+        return (plateau.getCoordinateX() >= coordinateX && plateau.getCoordinateY() >= coordinateY)
                 && (coordinateX > -1 && coordinateY > -1);
 
+    }
+
+    private boolean validateIsNotOccupiedPosition(Plateau plateau, int coordinateX, int coordinateY){
+        if(!isNull(plateau.getOccupiedPosition())) {
+            String[] occupiedPosition = plateau.getOccupiedPosition().split(" ");
+            int coordX = Integer.parseInt(occupiedPosition[0]);
+            int coordY = Integer.parseInt(occupiedPosition[1]);
+
+            return coordX != coordinateX || coordY != coordinateY;
+        }
+        return true;
+    }
+
+    private boolean validations(Plateau plateau, int coordinateX, int coordinateY){
+        return validateIsNotOutOfBorder(plateau, coordinateX, coordinateY) &&
+                validateIsNotOccupiedPosition(plateau, coordinateX, coordinateY);
     }
 
     /**
@@ -60,18 +77,22 @@ public class MowerMovementsUsecase {
         if(equalChar(mower.getHeading(), NORTH) || equalChar(mower.getHeading(), SOUTH)){
             int positionY = mower.getCoordinateY() + cardinalPoint.get(mower.getHeading());
 
-            if(validateIsNotOutOfBorder(mower.getPlateau(), mower.getCoordinateX(), positionY)){
+            if(validations(mower.getPlateau(), mower.getCoordinateX(), positionY)){
 
                 mower.setCoordinateY(positionY);
                 movementsNumber++;
+            }else {
+                throw new RuntimeException("Occupied position or movement out of border");
             }
 
         } else{
             int positionX = mower.getCoordinateX() + cardinalPoint.get(mower.getHeading());
-            if(validateIsNotOutOfBorder(mower.getPlateau(), positionX, mower.getCoordinateY())){
+            if(validations(mower.getPlateau(), positionX, mower.getCoordinateY())){
 
                 mower.setCoordinateX(positionX);
                 movementsNumber++;
+            }else {
+                throw new RuntimeException("Occupied position or movement out of border");
             }
         }
 
